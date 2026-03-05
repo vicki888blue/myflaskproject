@@ -1,20 +1,25 @@
 # app.py
+import os
 from flask import Flask, render_template
 from auth.routes import auth_bp
-from tickets.routes import tickets_bp          
-from db import init_engine                     
+from tickets.routes import tickets_bp
+from db import init_engine
 
 def create_app():
-    app = Flask(__name__)
-    app.secret_key = "change-me"
+    # If your templates (.html) are in the project root on PA:
+    app = Flask(__name__, template_folder='.')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'change-me')
 
-    
-    app.config["DATABASE_URL"] = "sqlite:///mydatabase.db"
-    init_engine(app.config["DATABASE_URL"])
+    # Absolute DB path on PythonAnywhere; local fallback when run on your PC
+    db_url = os.getenv('DATABASE_URL', 'sqlite:////home/vicki888blue/mydatabase.db')
+    if not os.path.exists('/home/vicki888blue/mydatabase.db'):
+        db_url = 'sqlite:///mydatabase.db'
+    app.config['DATABASE_URL'] = db_url
+    init_engine(db_url)
 
-   
-    app.register_blueprint(auth_bp)                          # /login, /register, etc.
-    app.register_blueprint(tickets_bp, url_prefix="/tickets")# /tickets, /tickets/new, ...
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(tickets_bp)  # url_prefix can be inside the blueprint
 
     @app.get("/")
     def home():
@@ -22,7 +27,8 @@ def create_app():
 
     return app
 
+# WSGI entrypoint (keeps local dev working too)
+application = create_app()
+
 if __name__ == "__main__":
-    app = create_app()
-    print("Starting development server at http://127.0.0.1:5000 …")
-    app.run(debug=True)
+    application.run(debug=True)

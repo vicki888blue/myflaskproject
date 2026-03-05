@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>{% block title %}Ticket System{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{--brand:#2563eb}
+    body { font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif; margin:0; background:#f7f7f7; }
+    header { background: var(--brand); color:#fff; padding:14px 20px; }
+    header a { color:#fff; text-decoration:none; margin-right:16px; font-weight:600; }
+    main { max-width: 1000px; margin: 24px auto; padding: 16px; background:#fff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,.06); }
+    .btn { display:inline-block; background:#2563eb; color:#fff; padding:8px 12px; border-radius:6px; text-decoration:none; border:none; cursor:pointer; }
+    .btn.secondary { background:#6b7280; }
+    .btn.danger { background:#dc2626; }
+    form.inline { display:inline; margin:0; }
+    table { border-collapse:collapse; width:100%; margin-top:12px; }
+    th, td { border:1px solid #e5e7eb; padding:8px 10px; text-align:left; }
+    th { background:#f3f4f6; }
+    .field { margin: 12px 0; }
+    label { font-weight:600; display:block; margin-bottom:6px; }
+    input, select { width:100%; padding:8px; border:1px solid #d1d5db; border-radius:6px; }
+    .flash { padding:10px 12px; background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; border-radius:6px; margin-bottom:12px; }
+    .flash.error { background:#fef2f2; color:#991b1b; border-color:#fecaca; }
+    .right { float:right; }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('tickets.list') }}">Tickets</a>
+
+    {% if session.get('user_id') and session.get('role_id') == 2 %}
+      <a href="{{ url_for('tickets.new_form') }}">New Ticket</a>
+    {% endif %}
+
+    <span class="right">
+      {% if session.get('user_id') %}
+        <span style="margin-right:10px;">Signed in as <strong>{{ session.get('username') }}</strong></span>
+
+        <form class="inline" method="post" action="{{ url_for('auth.logout') }}">
+          <button class="btn secondary" type="submit">Logout</button>
+        </form>
+
+      {% else %}
+        <a href="{{ url_for('auth.login_form') }}">Login</a>
+        <a href="{{ url_for('auth.register_form') }}">Register</a>
+      {% endif %}
+    </span>
+  </nav>
+</header>
+
+<main>
+  {% with msgs = get_flashed_messages(with_categories=True) %}
+    {% if msgs %}
+      {% for cat, msg in msgs %}
+        <div class="flash {% if cat == 'error' %}error{% endif %}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>
+

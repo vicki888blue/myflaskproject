@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}New Ticket{% endblock %}
+
+{% block content %}
+<h1>Create Ticket</h1>
+
+<form method="post" action="{{ url_for('tickets.create') }}">
+  <div class="field">
+    <label for="Ticket">Ticket ID</label>
+    <input id="Ticket" name="Ticket" required placeholder="e.g., INC-1004">
+  </div>
+
+  <div class="field">
+    <label for="Title">Title</label>
+    <input id="Title" name="Title" required maxlength="255" placeholder="Short summary">
+  </div>
+
+  <div class="field">
+    <label for="Description">Description</label>
+    <textarea id="Description" name="Description" rows="5" placeholder="Details"></textarea>
+  </div>
+
+  <div class="field">
+    <label for="Status">Status</label>
+    <select id="Status" name="Status" required>
+      <option value="Open" selected>Open</option>
+      <option value="In Prog">In Prog</option>
+      <option value="Closed">Closed</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="StatusID">Status ID</label>
+    <input id="StatusID" name="StatusID" type="number" min="1" step="1" value="1" required>
+  </div>
+
+  <div class="field">
+    <label for="PriorityID">Priority</label>
+    <input id="PriorityID" name="PriorityID" type="number" min="1" step="1" value="1" required>
+  </div>
+
+  <button class="btn" type="submit">Create</button>
+  <a class="btn secondary" href="{{ url_for('tickets.list') }}">Cancel</a>
+</form>
+{% endblock %}

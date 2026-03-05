@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Tickets{% endblock %}
+{% block content %}
+<h1>Tickets</h1>
+
+{% if session.get('user_id') and session.get('role_id') == 2 %}
+  <p><a class="btn" href="{{ url_for('tickets.new_form') }}">+ Create Ticket</a></p>
+{% endif %}
+
+{% if rows %}
+  <table>
+    <thead>
+      <tr>
+        <th>Ticket</th>
+        <th>Status</th>
+        <th>Created By</th>
+        <th>Priority</th>
+        <th>Status ID</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td>{{ r.Ticket }}</td>
+        <td>{{ r.Status }}</td>
+        <td>{{ r.CreatedBy }}</td>
+        <td>{{ r.PriorityID }}</td>
+        <td>{{ r.StatusID }}</td>
+        <td>
+          <a class="btn" href="{{ url_for('tickets.detail', ticket=r.Ticket) }}">View</a>
+
+          {% if session.get('role_id') == 2 %}
+            <a class="btn" href="{{ url_for('tickets.edit_form', ticket=r.Ticket) }}">Edit</a>
+
+            {% if r.Status != 'Closed' %}
+              <form class="inline" method="post" action="{{ url_for('tickets.close', ticket=r.Ticket) }}">
+                <button class="btn secondary" type="submit">Close</button>
+              </form>
+            {% endif %}
+
+            <form
+              class="inline"
+              method="post"
+              action="{{ url_for('tickets.delete', ticket=r.Ticket) }}"
+              onsubmit="return confirm('Delete ticket {{ r.Ticket }}?');"
+            >
+              <button class="btn danger" type="submit">Delete</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No tickets yet.</p>
+{% endif %}
+{% endblock %}

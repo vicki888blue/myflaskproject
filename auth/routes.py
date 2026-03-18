@@ -6,9 +6,7 @@ from flask import (
 from .service import register_user, authenticate
 from .roles import ROLE_USER  # default role for new users
 
-# IMPORTANT:
-# We point the blueprint to the main /templates folder.
-# Your templates live in /home/vicki888blue/templates
+
 auth_bp = Blueprint(
     "auth",
     __name__,

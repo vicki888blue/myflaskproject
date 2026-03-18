@@ -30,17 +30,9 @@ def role_required(*allowed_role_ids):
 
             role_id = user.get("role_id")
             if role_id not in allowed_role_ids:
-                # Authenticated but not authorized → 403 or safe redirect
-                # Preferred: return a proper 403
                 abort(403)
 
-                # If you prefer a redirect instead, comment the line above and use:
-                # flash("You do not have permission to do that.", "error")
-                # try:
-                #     return redirect(url_for("tickets.list"))
-                # except Exception:
-                #     return redirect(url_for("auth.login_form"))
-
+            
             return view(*args, **kwargs)
         return wrapped
     return decorator

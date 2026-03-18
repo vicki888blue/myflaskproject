@@ -9,8 +9,6 @@ from auth.roles import ROLE_ADMIN, ROLE_AGENT
 from . import repository as repo
 from . import service as svc
 
-# Point the blueprint at the project-level /templates folder
-# (i.e., /home/vicki888blue/templates on PythonAnywhere)
 tickets_bp = Blueprint(
     "tickets",
     __name__,
@@ -38,7 +36,6 @@ def new_form():
 def create():
     user = get_current_user()
 
-    # Validate form input
     errors, data = svc.validate_new(request.form, user["username"])
     if errors:
         for e in errors:
@@ -46,7 +43,7 @@ def create():
         return redirect(url_for("tickets.new_form"))
 
     try:
-        repo.create_ticket(data)  # raises IntegrityError on unique violations
+        repo.create_ticket(data)  
     except IntegrityError:
         flash(f"Ticket '{data['Ticket']}' already exists. Choose a different Ticket ID.", "error")
         return redirect(url_for("tickets.new_form"))
@@ -54,7 +51,7 @@ def create():
     flash("Ticket created.", "success")
     return redirect(url_for("tickets.list"))
 
-# DETAIL: GET /tickets/<ticket>  (logged-in)
+# DETAIL GET /tickets/<ticket>  (logged-in)
 @tickets_bp.get("/<ticket>")
 @login_required
 def detail(ticket):
@@ -63,7 +60,7 @@ def detail(ticket):
         return ("Not found", 404)
     return render_template("ticket_detail.html", row=row, user=get_current_user())
 
-# EDIT FORM: GET /tickets/<ticket>/edit  (Admin + Agent)
+# EDIT FORM GET /tickets/<ticket>/edit  (Admin + Agent)
 @tickets_bp.get("/<ticket>/edit")
 @login_required
 @role_required(ROLE_ADMIN, ROLE_AGENT)
@@ -107,5 +104,6 @@ def delete(ticket):
     deleted = repo.delete_ticket(ticket)
     flash("Ticket deleted." if deleted else "Ticket not found.", "success" if deleted else "error")
     return redirect(url_for("tickets.list"))
+
 
 

@@ -107,11 +107,9 @@ def validate_update(form, username: str):
     if raw_assignee is not None:
         data["Assignee"] = _clean_str(raw_assignee) or ""
 
-    # audit fields (if your schema supports them)
     data["UpdatedBy"] = username
     data["UpdatedAt"] = datetime.utcnow().isoformat(timespec="seconds")
 
-    # must have at least one non-audit change
     non_audit = {k: v for k, v in data.items() if k not in {"UpdatedBy", "UpdatedAt"}}
     if not non_audit:
         errors.append("No fields provided to update.")

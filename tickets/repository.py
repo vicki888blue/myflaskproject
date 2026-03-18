@@ -5,19 +5,15 @@ from sqlalchemy import text
 from db import connect, transaction
 
 
-# -------- Read operations --------
-
 def list_tickets() -> List[Dict[str, Any]]:
-    """
-    Returns tickets with the columns that actually exist in your current schema.
-    """
     sql = text("""
         SELECT
             Ticket,
             Status,
             CreatedBy,
             PriorityID,
-            StatusID
+            StatusID,
+            Description
         FROM Tickets
         ORDER BY Ticket ASC
     """)
@@ -32,7 +28,8 @@ def get_ticket(ticket_id: str) -> Optional[Dict[str, Any]]:
             Status,
             CreatedBy,
             PriorityID,
-            StatusID
+            StatusID,
+            Description
         FROM Tickets
         WHERE Ticket = :t
     """)
@@ -47,40 +44,36 @@ def exists_ticket(ticket_id: str) -> bool:
         return conn.execute(sql, {"t": ticket_id}).first() is not None
 
 
-# -------- Write operations --------
-
 def create_ticket(data: Dict[str, Any]) -> None:
     """
-    Insert using only existing columns.
-    Expects keys: Ticket, Status, CreatedBy, PriorityID, StatusID
-    (Extra keys in `data` are ignored.)
+    Expects: Ticket, Status, CreatedBy, PriorityID, StatusID
+    Optional: Description
     """
     sql = text("""
-        INSERT INTO Tickets (Ticket, Status, CreatedBy, PriorityID, StatusID)
-        VALUES (:Ticket, :Status, :CreatedBy, :PriorityID, :StatusID)
+        INSERT INTO Tickets (Ticket, Status, CreatedBy, PriorityID, StatusID, Description)
+        VALUES (:Ticket, :Status, :CreatedBy, :PriorityID, :StatusID, :Description)
     """)
     params = {
-        "Ticket":     data["Ticket"],
-        "Status":     data["Status"],
-        "CreatedBy":  data["CreatedBy"],
-        "PriorityID": data["PriorityID"],
-        "StatusID":   data["StatusID"],
+        "Ticket":      data["Ticket"],
+        "Status":      data["Status"],
+        "CreatedBy":   data["CreatedBy"],
+        "PriorityID":  data["PriorityID"],
+        "StatusID":    data["StatusID"],
+        "Description": data.get("Description"),  # None if not provided
     }
     with transaction() as conn:
         conn.execute(sql, params)
-    # Let IntegrityError bubble to the route if a duplicate key occurs.
 
 
 def update_ticket(ticket_id: str, data: Dict[str, Any]) -> bool:
     """
-    Partial update for existing columns only.
-    Allowed fields: Status, PriorityID, StatusID
-    (We do NOT update CreatedBy when editing.)
+    Partial update.
+    Allowed: Status, PriorityID, StatusID, Description
     """
-    allowed = {"Status", "PriorityID", "StatusID"}
-
+    allowed = {"Status", "PriorityID", "StatusID", "Description"}
     sets: List[str] = []
     params: Dict[str, Any] = {"t": ticket_id}
+
     for k in allowed:
         if k in data:
             sets.append(f"{k} = :{k}")

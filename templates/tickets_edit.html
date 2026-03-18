@@ -33,11 +33,10 @@
     <input id="PriorityID" name="PriorityID" type="number" min="1" step="1" value="{{ row.PriorityID }}" required>
   </div>
 
-  <label for="statusid">Status ID</label>
-<select id="statusid" name="StatusID">
-  <option value="Assigned" {{ 'selected' if row.StatusID == 'Assigned' else '' }}>Assigned</option>
-  <option value="Not Assigned" {{ 'selected' if row.StatusID == 'Not Assigned' else '' }}>Not Assigned</option>
-</select>
+  <div class="field">
+    <label for="StatusID">Status ID</label>
+    <input id="StatusID" name="StatusID" value="{{ row.StatusID }}" required>
+  </div>
 
   <button class="btn" type="submit">Save Changes</button>
   <a class="btn secondary" href="{{ url_for('tickets.detail', ticket=row.Ticket) }}">Cancel</a>

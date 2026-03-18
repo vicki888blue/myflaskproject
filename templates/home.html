@@ -2,24 +2,16 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>Welcome to the 3rd Line Ticket Manager Q</h1>
-<p>This is your test web app. Use the navigation above to get around.</p>
+<h1>Welcome</h1>
 
-{% if session.get('user_id') %}
-  <p>You are logged in as <strong>{{ session.get('username') }}</strong>.</p>
+<p>This is your ticketing system homepage.</p>
+
+<p>
+  <a class="btn" href="{{ url_for('tickets.list') }}">View Tickets</a>
 
   {% if session.get('role_id') == 2 %}
-    <p>
-      <a class="btn" href="{{ url_for('tickets.new_form') }}">Create New Ticket</a>
-    </p>
+    <a class="btn" href="{{ url_for('tickets.new_form') }}">Create Ticket</a>
   {% endif %}
-
-{% else %}
-  <p>You are not logged in.</p>
-  <p>
-    <a class="btn" href="{{ url_for('auth.login_form') }}">Login</a>
-    <a class="btn secondary" href="{{ url_for('auth.register_form') }}">Register</a>
-  </p>
-{% endif %}
+</p>
 
 {% endblock %}

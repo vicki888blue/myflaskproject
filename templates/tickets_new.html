@@ -1,45 +1,65 @@
 {% extends "base.html" %}
-{% block title %}New Ticket{% endblock %}
+{% block title %}Create Ticket{% endblock %}
 
 {% block content %}
 <h1>Create Ticket</h1>
 
+{# Show any flashed validation errors/messages #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 <form method="post" action="{{ url_for('tickets.create') }}">
   <div class="field">
-    <label for="Ticket">Ticket ID</label>
-    <input id="Ticket" name="Ticket" required placeholder="e.g., INC-1004">
+    <label for="ticket">Ticket ID</label>
+    <input id="ticket"
+           name="Ticket"
+           required
+           value="{{ request.form.get('Ticket','') }}">
   </div>
 
   <div class="field">
-    <label for="Title">Title</label>
-    <input id="Title" name="Title" required maxlength="255" placeholder="Short summary">
-  </div>
-
-  <div class="field">
-    <label for="Description">Description</label>
-    <textarea id="Description" name="Description" rows="5" placeholder="Details"></textarea>
-  </div>
-
-  <div class="field">
-    <label for="Status">Status</label>
-    <select id="Status" name="Status" required>
-      <option value="Open" selected>Open</option>
-      <option value="In Prog">In Prog</option>
-      <option value="Closed">Closed</option>
+    <label for="status">Status</label>
+    <select id="status" name="Status">
+      {# Keep these in sync with ALLOWED_STATUSES in service.py #}
+      <option value="Open"    {{ 'selected' if request.form.get('Status','Open') == 'Open' else '' }}>Open</option>
+      <option value="In Prog" {{ 'selected' if request.form.get('Status') == 'In Prog' else '' }}>In Prog</option>
+      <option value="Closed"  {{ 'selected' if request.form.get('Status') == 'Closed' else '' }}>Closed</option>
     </select>
   </div>
 
   <div class="field">
-    <label for="StatusID">Status ID</label>
-    <input id="StatusID" name="StatusID" type="number" min="1" step="1" value="1" required>
+    <label for="priority">PriorityID</label>
+    <input id="priority"
+           name="PriorityID"
+           type="number"
+           min="1"
+           required
+           value="{{ request.form.get('PriorityID','') }}">
   </div>
+
+<label for="statusid">Status ID</label>
+<select id="statusid" name="StatusID" required>
+  <option value="Assigned" {{ 'selected' if request.form.get('StatusID') == 'Assigned' else '' }}>Assigned</option>
+  <option value="Not Assigned" {{ 'selected' if request.form.get('StatusID') == 'Not Assigned' else '' }}>Not Assigned</option>
+</select>
 
   <div class="field">
-    <label for="PriorityID">Priority</label>
-    <input id="PriorityID" name="PriorityID" type="number" min="1" step="1" value="1" required>
+    <label for="description">Description</label>
+    <textarea id="description"
+              name="Description"
+              rows="5">{{ request.form.get('Description','') }}</textarea>
   </div>
 
-  <button class="btn" type="submit">Create</button>
-  <a class="btn secondary" href="{{ url_for('tickets.list') }}">Cancel</a>
+  <div class="actions">
+    <button type="submit" class="btn">Create</button>
+    <a class="btn secondary" href="{{ url_for('tickets.list') }}">Cancel</a>
+  </div>
 </form>
 {% endblock %}

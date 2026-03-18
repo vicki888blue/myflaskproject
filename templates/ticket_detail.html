@@ -9,22 +9,21 @@
 <p><strong>Priority:</strong> {{ row.PriorityID }}</p>
 <p><strong>Status ID:</strong> {{ row.StatusID }}</p>
 
+<h3>Description</h3>
+<pre style="white-space: pre-wrap;">{{ row.Description or '—' }}</pre>
+
 <p>
-  <!-- Back to list -->
   <a class="btn" href="{{ url_for('tickets.list') }}">← Back to list</a>
 
   {% if session.get('role_id') == 2 %}
-    <!-- Edit -->
     <a class="btn" href="{{ url_for('tickets.edit_form', ticket=row.Ticket) }}">Edit</a>
 
-    <!-- Close ticket (only if not Closed) -->
     {% if row.Status != 'Closed' %}
       <form class="inline" method="post" action="{{ url_for('tickets.close', ticket=row.Ticket) }}">
         <button class="btn secondary" type="submit">Close</button>
       </form>
     {% endif %}
 
-    <!-- Delete ticket -->
     <form class="inline" method="post" action="{{ url_for('tickets.delete', ticket=row.Ticket) }}"
           onsubmit="return confirm('Delete ticket {{ row.Ticket }}?');">
       <button class="btn danger" type="submit">Delete</button>
